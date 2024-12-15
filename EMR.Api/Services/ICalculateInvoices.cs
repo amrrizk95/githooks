@@ -5,6 +5,6 @@ namespace EMR.Api.Services
     public interface ICalculateInvoices
     {
 
-      public  decimal CalculateInvoice(Invoice invoice);
+        public decimal CalculateInvoice(Invoice invoice);
     }
 }

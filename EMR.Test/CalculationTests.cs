@@ -21,7 +21,7 @@ namespace EMR.Test
         }
         public CalculationTests()
         {
-                _calculateInvoices = new CalculateInvoices();
+            _calculateInvoices = new CalculateInvoices();
         }
         [TestMethod]
         public void Calculate()
