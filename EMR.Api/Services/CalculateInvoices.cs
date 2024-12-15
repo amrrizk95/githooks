@@ -4,6 +4,8 @@ namespace EMR.Api.Services
 {
     public class CalculateInvoices : ICalculateInvoices
     {
+
+
         public decimal CalculateInvoice(Invoice invoice)
         {
             var vat = invoice.VatPercentage;
