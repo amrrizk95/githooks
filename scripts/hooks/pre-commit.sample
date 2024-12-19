@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+echo "=== Running pre-commit checks ==="
+
+# Enforce code formatting
+echo "Running code formatting..."
+dotnet format 
+if [ $? -ne 0 ]; then
+  echo "Code formatting issues detected. Please run 'dotnet format' and fix them before committing."
+  exit 1
+fi
+
+# Run unit tests
+echo "Running unit tests..."
+dotnet test  --no-build
+if [ $? -ne 0 ]; then
+  echo "Unit tests failed. Please fix the issues before committing."
+  exit 1
+fi
+
+echo "All checks passed. Proceeding with commit."

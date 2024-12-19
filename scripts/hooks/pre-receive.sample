@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# pre-receive hook for enforcing branch naming conventions
+
+# Allowed pattern: task/<number> or bug/<number>
+pattern='^(task/[0-9]+|bug/[0-9]+)$'
+
+# pre-receive hook receives refs on stdin: oldrev newrev refname
+# We'll read each line and extract the ref name
+while read oldrev newrev refname; do
+    # Strip 'refs/heads/' from refname to get the branch name
+    branch=$(echo "$refname" | sed 's|^refs/heads/||')
+
+    # If the ref is a branch (not a tag) and newrev is not 000000... (meaning branch is created or updated)
+    if [[ "$refname" == refs/heads/* && "$newrev" != 0000000000000000000000000000000000000000 ]]; then
+        if [[ ! "$branch" =~ $pattern ]]; then
+            echo "ERROR: The branch '$branch' does not follow the naming convention."
+            echo "Allowed formats: 'task/<number>' or 'bug/<number>'"
+            # Exit with non-zero code to reject the push
+            exit 1
+        fi
+    fi
+done
+
+# If we get here, all branches pass the check
+exit 0

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Run unit tests
+echo "Running unit tests..."
+dotnet test  --no-build
+if [ $? -ne 0 ]; then
+  echo "Unit tests failed. Please fix the issues before committing."
+  exit 1
+fi
+
+echo "All checks passed. Proceeding with commit."

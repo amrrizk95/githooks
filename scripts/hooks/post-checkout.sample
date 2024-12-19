@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# The arguments passed to post-checkout are:
+# 1: Ref of the previous HEAD
+# 2: Ref of the new HEAD
+# 3: A flag (0 if it's a branch checkout, 1 if it's a file checkout)
+
+old_ref=$1
+new_ref=$2
+branch_flag=$3
+
+# Only proceed if this is a branch checkout (branch_flag = 0)
+if [ "$branch_flag" = "0" ]; then
+    # Get the current branch name
+    current_branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+
+    # Check the naming convention with a regex
+    # This pattern requires that the branch start with "task/" or "bug/"
+    # followed by one or more digits.
+    if [[ ! "$current_branch" =~ ^(task/[0-9]+|bug/[0-9]+)$ ]]; then
+        echo "WARNING: Current branch '$current_branch' does not follow the naming convention."
+        echo "Expected format: 'task/<number>' or 'bug/<number>'."
+    fi
+fi

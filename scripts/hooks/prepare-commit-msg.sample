@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# The commit message file is passed as the first argument
+COMMIT_MSG_FILE="$1"
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Define a regex pattern:
+# - Starts with either task/<digits> or bug/<digits>
+# - Followed by " : " and some message text
+pattern='^(task/[0-9]+|bug/[0-9]+) : .+'
+
+if [[ $COMMIT_MSG =~ $pattern ]]; then
+  # If it matches, allow the commit
+  exit 0
+else
+  # If it doesn't match, print an error and block the commit
+  echo "ERROR: Commit message format is invalid."
+  echo "Please use one of the following formats:"
+  echo "  task/<number of task> : <commit message>"
+  echo "  bug/<number of bug>  : <commit message>"
+  exit 1
+fi
