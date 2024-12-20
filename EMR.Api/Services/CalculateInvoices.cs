@@ -14,9 +14,10 @@ namespace EMR.Api.Services
 
             var subtotal = extraFees + processingFees;
             var totalFees = extraFees + processingFees + (subtotal) * vat;
-            // adding some code 
+
+            // commit message should be follow some rules 
 
             return totalFees;
-           }
-      }
+        }
+    }
 }
