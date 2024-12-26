@@ -46,5 +46,5 @@ jobs:
 
       - name: Build project
         run: dotnet build --no-restore --configuration Release
-      -name: deploy
-       run: echo "deploy ..."
+      - name: deploy
+        run: echo "deploy ..."
