@@ -42,7 +42,7 @@ namespace EMR.Test
 
             // 
             // Assert
-            Assert.AreNotEqual(expected, result);
+            Assert.AreEqual(expected, result);
         }
     }
 }
