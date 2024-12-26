@@ -8,6 +8,7 @@ namespace EMR.Api.Services
 
         public decimal CalculateInvoice(Invoice invoice)
         {
+
             var vat = invoice.VatPercentage;
             var extraFees = invoice.ExtraFees;
             var processingFees = invoice.ProcessingFees;
