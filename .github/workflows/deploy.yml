@@ -35,7 +35,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: build-artifacts
-          path: ./bin/Release/net8.0
+          path: '**/bin/Release/net8.0/**'
           include-hidden-files: true
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
