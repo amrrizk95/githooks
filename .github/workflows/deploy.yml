@@ -35,7 +35,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: build-artifacts
-          path: ./bin/Release
+          path: ./bin/Release/**
+          include-hidden-files: true
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: test
@@ -45,6 +46,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build-artifacts
-          
+
       - name: deploy
         run: echo "deploy ..."
