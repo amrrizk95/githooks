@@ -1,4 +1,4 @@
-name: Deploy 
+name: Test and Deploy Workflow
 
 on:
   push:
@@ -16,6 +16,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Cache .NET dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v3
         with:
@@ -30,22 +38,25 @@ jobs:
       - name: Run tests
         run: dotnet test --no-build --configuration Release --verbosity normal
 
-      - name: save build artifacts
-        if: success() # only save artifacts if tests succeeded 
+      - name: Save Build Artifacts
+        if: success()
         uses: actions/upload-artifact@v3
         with:
           name: build-artifacts
           path: '**/bin/Release/net8.0/**'
           include-hidden-files: true
+          if-no-files-found: warn
+
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: test
     runs-on: ubuntu-latest
+
     steps:
-      - name: Download build artifacts 
+      - name: Download Build Artifacts
         uses: actions/download-artifact@v3
         with:
           name: build-artifacts
 
-      - name: deploy
-        run: echo "deploy ..."
+      - name: Deploy Project
+        run: echo "Deploying project with artifacts..."
