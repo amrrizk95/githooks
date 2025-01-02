@@ -8,6 +8,12 @@ on:
     branches:
       - master
 
+env:
+  DOTNET_VERSION: '7.x'  # .NET Core version to use
+  BUILD_CONFIGURATION: 'Release'  # Build configuration
+  BUILD_OUTPUT_PATH: '**/bin/Release/net8.0/**'  # Path to build output
+  NUGET_CACHE_PATH: ~/.nuget/packages  # Path to NuGet cache
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -19,7 +25,7 @@ jobs:
       - name: Cache .NET dependencies
         uses: actions/cache@v3
         with:
-          path: ~/.nuget/packages
+          path: ${{env.NUGET_CACHE_PATH}}
           key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
           restore-keys: |
             nuget-${{ runner.os }}-
@@ -27,23 +33,23 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '7.x' # Replace with your target .NET version
+          dotnet-version: ${{env.DOTNET_VERSION}} # Replace with your target .NET version
 
       - name: Restore dependencies
         run: dotnet restore
 
       - name: Build project
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build --no-restore --configuration ${{ env.BUILD_CONFIGURATION }}
 
       - name: Run tests
-        run: dotnet test --no-build --configuration Release --verbosity normal
+        run: dotnet test --no-build --configuration ${{ env.BUILD_CONFIGURATION }} --verbosity normal
 
       - name: Save Build Artifacts
         if: success()
         uses: actions/upload-artifact@v3
         with:
           name: build-artifacts
-          path: '**/bin/Release/net8.0/**'
+          path: ${{ env.BUILD_OUTPUT_PATH }}
           include-hidden-files: true
           if-no-files-found: warn
 
@@ -59,4 +65,4 @@ jobs:
           name: build-artifacts
 
       - name: Deploy Project
-        run: echo "Deploying project with artifacts..."
+        run: echo "Deploying project with artifacts from ${{ env.BUILD_OUTPUT_PATH }}"
