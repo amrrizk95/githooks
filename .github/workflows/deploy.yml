@@ -9,10 +9,10 @@ on:
       - master
 
 env:
-  DOTNET_VERSION: '7.x'  # .NET Core version to use
-  BUILD_CONFIGURATION: 'Release'  # Build configuration
-  BUILD_OUTPUT_PATH: '**/bin/Release/net8.0/**'  # Path to build output
-  NUGET_CACHE_PATH: ~/.nuget/packages  # Path to NuGet cache
+  DOTNET_VERSION: '7.x'
+  BUILD_CONFIGURATION: 'Release'
+  BUILD_OUTPUT_PATH: '**/bin/Release/net8.0/**'
+  NUGET_CACHE_PATH: ~/.nuget/packages
 
 jobs:
   test:
@@ -25,7 +25,7 @@ jobs:
       - name: Cache .NET dependencies
         uses: actions/cache@v3
         with:
-          path: ${{env.NUGET_CACHE_PATH}}
+          path: ${{ env.NUGET_CACHE_PATH }}
           key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
           restore-keys: |
             nuget-${{ runner.os }}-
@@ -33,7 +33,7 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: ${{env.DOTNET_VERSION}} # Replace with your target .NET version
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore dependencies
         run: dotnet restore
@@ -65,9 +65,8 @@ jobs:
           name: build-artifacts
 
       - name: Deploy Project
-        env: 
-          DEPLOYMENT_TOKEN: ${{secrets.DEPLOYMENT_TOKEN}}
+        env:
+          DEPLOYMENT_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
         run: |
-        echo "Deploying project with artifacts from ${{ env.BUILD_OUTPUT_PATH }}"
-        echo "Token: $DEPLOYMENT_TOKEN" # For demonstration only; avoid printing secrets in real workflows.
-
+          echo "Deploying project using the token..."
+          echo "Token: $DEPLOYMENT_TOKEN" # For demonstration only; avoid printing secrets in real workflows.
