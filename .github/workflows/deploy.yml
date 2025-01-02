@@ -65,4 +65,6 @@ jobs:
           name: build-artifacts
 
       - name: Deploy Project
+        env:
+          DEPLOYMENT_TOKEN:${{secrets.DEPLOYMENT_TOKEN}}
         run: echo "Deploying project with artifacts from ${{ env.BUILD_OUTPUT_PATH }}"
