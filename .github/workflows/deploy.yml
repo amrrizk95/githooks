@@ -75,11 +75,16 @@ jobs:
 
   report: 
     needs: [deploy]
-    if: failure()
     runs-on: ubuntu-latest
     steps:
+        if: failure()
       - name: output information
         run: |
           echo "Something went wrong"
           echo ${{toJSON(github)}}
+        if: success()
+      - name: success information
+        run: |
+          echo "everything is ok"
+    
 
