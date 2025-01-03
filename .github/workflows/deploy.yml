@@ -17,6 +17,7 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    environment: testing
 
     steps:
       - name: Checkout code
@@ -57,6 +58,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: test
     runs-on: ubuntu-latest
+    environment: production
 
     steps:
       - name: Download Build Artifacts
@@ -70,3 +72,14 @@ jobs:
         run: |
           echo "Deploying project using the token..."
           echo "Token: $DEPLOYMENT_TOKEN" # For demonstration only; avoid printing secrets in real workflows.
+
+  report: 
+    needs: [deploy]
+    if: failure()
+    runs-on: ubuntu-latest
+    stepts:
+      - name: output information
+        run: |
+          echo "Something went wrong"
+          echo ${{toJSON(github) }}
+
