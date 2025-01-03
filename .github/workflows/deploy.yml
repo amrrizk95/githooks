@@ -77,9 +77,9 @@ jobs:
     needs: [deploy]
     if: failure()
     runs-on: ubuntu-latest
-    stepts:
+    steps:
       - name: output information
         run: |
           echo "Something went wrong"
-          echo ${{toJSON(github) }}
+          echo ${{toJSON(github)}}
 
