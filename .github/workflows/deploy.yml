@@ -71,20 +71,21 @@ jobs:
           DEPLOYMENT_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
         run: |
           echo "Deploying project using the token..."
-          echo "Token: $DEPLOYMENT_TOKEN" # For demonstration only; avoid printing secrets in real workflows.
+          # Remove sensitive output in production
+          echo "Token: $DEPLOYMENT_TOKEN"
 
-  report: 
+  report:
     needs: [deploy]
     runs-on: ubuntu-latest
-    steps:
-        if: failure()
-      - name: output information
-        run: |
-          echo "Something went wrong"
-          echo ${{toJSON(github)}}
-        if: success()
-      - name: success information
-        run: |
-          echo "everything is ok"
-    
 
+    steps:
+      - name: Output Information on Failure
+        if: ${{ failure() }}
+        run: |
+          echo "Something went wrong during the deployment."
+          echo ${{ toJSON(github) }}
+
+      - name: Success Information
+        if: ${{ success() }}
+        run: |
+          echo "Everything is OK. Deployment succeeded!"
