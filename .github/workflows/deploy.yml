@@ -9,32 +9,36 @@ on:
       - master
 
 env:
-  DOTNET_VERSION: '7.x'
   BUILD_CONFIGURATION: 'Release'
-  BUILD_OUTPUT_PATH: '**/bin/Release/net8.0/**'
+  BUILD_OUTPUT_PATH: '**/bin/Release/**'
   NUGET_CACHE_PATH: ~/.nuget/packages
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     environment: testing
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest] # Test on multiple operating systems
+        dotnet-version: ['6.x', '7.x']                   # Test on multiple .NET versions
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
       - name: Cache .NET dependencies
         uses: actions/cache@v3
         with:
           path: ${{ env.NUGET_CACHE_PATH }}
-          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          key: nuget-${{ runner.os }}-${{ matrix.dotnet-version }}-${{ hashFiles('**/*.csproj') }}
           restore-keys: |
-            nuget-${{ runner.os }}-
-
-      - name: Setup .NET Core
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+            nuget-${{ runner.os }}-${{ matrix.dotnet-version }}-
 
       - name: Restore dependencies
         run: dotnet restore
@@ -49,13 +53,12 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v3
         with:
-          name: build-artifacts
+          name: build-artifacts-${{ matrix.os }}-${{ matrix.dotnet-version }}
           path: ${{ env.BUILD_OUTPUT_PATH }}
           include-hidden-files: true
           if-no-files-found: warn
 
   deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: test
     runs-on: ubuntu-latest
     environment: production
@@ -64,7 +67,7 @@ jobs:
       - name: Download Build Artifacts
         uses: actions/download-artifact@v3
         with:
-          name: build-artifacts
+          name: build-artifacts-ubuntu-latest-7.x # Example: Customize based on your matrix
 
       - name: Deploy Project
         env:
