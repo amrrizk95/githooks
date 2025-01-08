@@ -23,7 +23,7 @@ jobs:
       - name: Download Build Artifacts
         uses: actions/download-artifact@v3
         with:
-          name: build-artifacts
+          name: ${{ needs.test-and-build.outputs.artifact-path }}
 
       - name: Deploy Project
         env:
