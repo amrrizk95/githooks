@@ -10,7 +10,7 @@ on:
 
 jobs:
   test-and-build:
-    uses: ./.github/workflows/test-and-build.yml # Reuse the workflow
+    uses: ./.github/workflows/test-and-build.yml
     with:
       dotnet-version: '7.x'
       configuration: 'Release'

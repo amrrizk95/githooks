@@ -22,8 +22,9 @@ jobs:
   test-and-build:
     runs-on: ubuntu-latest
 
-    outputs: 
-      artifact-path: ${{ steps.upload-artifact.outputs.artifact-path}}
+    outputs:
+      artifact-path: ${{ steps.upload-artifact.outputs.artifact-path }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
