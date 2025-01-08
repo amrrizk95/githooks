@@ -1,0 +1,47 @@
+name: Test and Build Workflow
+
+on:
+  workflow_call:
+    inputs:
+      dotnet-version:
+        description: 'The .NET version to use'
+        required: true
+        type: string
+      configuration:
+        description: 'Build configuration (e.g., Release)'
+        required: true
+        type: string
+    secrets:
+      DEPLOYMENT_TOKEN:
+        required: false
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ inputs.dotnet-version }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build project
+        run: dotnet build --no-restore --configuration ${{ inputs.configuration }}
+
+      - name: Run tests
+        run: dotnet test --no-build --configuration ${{ inputs.configuration }} --verbosity normal
+
+      - name: Save Build Artifacts
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: '**/bin/${{ inputs.configuration }}/**'
+          include-hidden-files: true
+          if-no-files-found: warn

@@ -1,4 +1,4 @@
-name: Test and Deploy Workflow
+name: Main Workflow
 
 on:
   push:
@@ -8,66 +8,22 @@ on:
     branches:
       - master
 
-env:
-  BUILD_CONFIGURATION: 'Release'
-  BUILD_OUTPUT_PATH: '**/bin/Release/**'
-  NUGET_CACHE_PATH: ~/.nuget/packages
-
 jobs:
-  test:
-    runs-on: ${{ matrix.os }}
-    environment: testing
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest] # Test on multiple operating systems
-        dotnet-version: ['6.x', '7.x']                   # Test on multiple .NET versions
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup .NET Core
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: ${{ matrix.dotnet-version }}
-
-      - name: Cache .NET dependencies
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.NUGET_CACHE_PATH }}
-          key: nuget-${{ runner.os }}-${{ matrix.dotnet-version }}-${{ hashFiles('**/*.csproj') }}
-          restore-keys: |
-            nuget-${{ runner.os }}-${{ matrix.dotnet-version }}-
-
-      - name: Restore dependencies
-        run: dotnet restore
-
-      - name: Build project
-        run: dotnet build --no-restore --configuration ${{ env.BUILD_CONFIGURATION }}
-
-      - name: Run tests
-        run: dotnet test --no-build --configuration ${{ env.BUILD_CONFIGURATION }} --verbosity normal
-
-      - name: Save Build Artifacts
-        if: success()
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-artifacts-${{ matrix.os }}-${{ matrix.dotnet-version }}
-          path: ${{ env.BUILD_OUTPUT_PATH }}
-          include-hidden-files: true
-          if-no-files-found: warn
+  test-and-build:
+    uses: ./.github/workflows/test-and-build.yml # Reuse the workflow
+    with:
+      dotnet-version: '7.x'
+      configuration: 'Release'
 
   deploy:
-    needs: test
+    needs: test-and-build
     runs-on: ubuntu-latest
-    environment: production
 
     steps:
       - name: Download Build Artifacts
         uses: actions/download-artifact@v3
         with:
-          name: build-artifacts-ubuntu-latest-7.x # Example: Customize based on your matrix
+          name: build-artifacts
 
       - name: Deploy Project
         env:
@@ -76,19 +32,3 @@ jobs:
           echo "Deploying project using the token..."
           # Remove sensitive output in production
           echo "Token: $DEPLOYMENT_TOKEN"
-
-  report:
-    needs: [deploy]
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Output Information on Failure
-        if: ${{ failure() }}
-        run: |
-          echo "Something went wrong during the deployment."
-          echo ${{ toJSON(github) }}
-
-      - name: Success Information
-        if: ${{ success() }}
-        run: |
-          echo "Everything is OK. Deployment succeeded!"
