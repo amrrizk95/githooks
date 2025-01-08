@@ -30,5 +30,4 @@ jobs:
           DEPLOYMENT_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
         run: |
           echo "Deploying project using the token..."
-          # Remove sensitive output in production
-          echo "Token: $DEPLOYMENT_TOKEN"
+          echo "Deployment completed successfully!"
